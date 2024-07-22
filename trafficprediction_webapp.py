@@ -204,7 +204,8 @@ def main():
                         - **Upload Live Video:** Users can turn on the webcam or mobile camera and upload live video feed of traffic signs.
                         - **View Prediction:** Once an image of a traffic sign is uploaded, the dashboard processes the image and displays the predicted traffic sign along with its corresponding class. This feature provides users with immediate feedback on the traffic sign’s identification, helping to ensure that they can quickly understand the type of sign and its meaning. 
                         - **Learn About the Traffic Sign:** After viewing the prediction, users can access detailed information about the identified traffic sign. This includes its meaning, the actions required in response to the sign, and any relevant traffic rules or regulations.""")
-            st.image("bg3.png", use_column_width=True)
+        with col8:    
+           st.image("bg3.png", use_column_width=True)
 
 if __name__ == "__main__":
     main()
