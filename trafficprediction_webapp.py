@@ -30,7 +30,7 @@ def save_user_db(user_db):
 user_db = load_user_db()
 
 # Load and display the logo
-image = Image.open("C:/Users/SEC/Downloads/logo.png")
+image = Image.open("logo.png")
 col1, col2 = st.columns([0.4, 0.5])
 with col1:
     st.image(image, width=350)
@@ -61,7 +61,7 @@ with st.sidebar:
                            default_index=0)
 
 # Load the model architecture from JSON
-with open("C:/Users/SEC/Downloads/model_architecture.json", "r") as json_file:
+with open("model_architecture.json", "r") as json_file:
     model_json = json_file.read()
 loaded_model = tf.keras.models.model_from_json(model_json)
 
@@ -142,7 +142,7 @@ def main():
     if selected == "Home":
         st.title("Welcome to Traffic Sign Identifier")
         st.write("Your advanced tool for recognizing and interpreting traffic signs to enhance autonomous vehicle navigation.")
-        st.image("C:/Users/SEC/Downloads/giff.gif", use_column_width=True)
+        st.image("giff.gif", use_column_width=True)
 
         # Buttons for login and signup
         col1, col2 = st.columns(2)
@@ -243,10 +243,10 @@ def main():
         with col5:
             st.markdown("##### Welcome to Traffic Sign Identifier, your advanced tool for recognizing and interpreting traffic signs to enhance autonomous vehicle navigation. This platform is designed to help vehicles identify various traffic signs in real-time, ensuring safe and efficient driving. Empowering autonomous systems with accurate traffic sign recognition, this tool helps in making informed driving decisions and adapting to road conditions dynamically.")
         with col6:
-            st.image("C:/Users/SEC/Downloads/bg.jpeg", use_column_width=True)
+            st.image("bg.jpeg", use_column_width=True)
 
         with col3:
-            st.image("C:/Users/SEC/Downloads/giphy.webp", use_column_width=True)
+            st.image("giphy.webp", use_column_width=True)
         with col4:
             st.header("Key Features")
             st.markdown("""
@@ -263,7 +263,7 @@ def main():
                         - **View Prediction:** Once an image of a traffic sign is uploaded, the dashboard processes the image and displays the predicted traffic sign along with its corresponding class. This feature provides users with immediate feedback on the traffic sign’s identification, helping to ensure that they can quickly understand the type of sign and its meaning. 
                         - **Learn About the Traffic Sign:** After viewing the prediction, users can access detailed information about the identified traffic sign. This includes its meaning, the actions required in response to the sign, and any relevant traffic rules or regulations.""")
         with col8:
-            st.image("C:/Users/SEC/Downloads/bg3.png", use_column_width=True)
+            st.image("bg3.png", use_column_width=True)
 
 
 if __name__ == "__main__":
