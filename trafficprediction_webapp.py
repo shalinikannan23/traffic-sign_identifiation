@@ -5,29 +5,11 @@ from PIL import Image, ImageDraw
 import pickle
 import json
 from streamlit_option_menu import option_menu
-from passlib.context import CryptContext
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Set page configuration
 st.set_page_config(page_title="TRAFFIC SIGN IDENTIFICATION",
                    layout="wide",
                    page_icon="heart-pulse-fill")
-
-# Load or initialize user database
-def load_user_db():
-    try:
-        with open("user_db.json", "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {}
-
-def save_user_db(user_db):
-    with open("user_db.json", "w") as file:
-        json.dump(user_db, file)
-
-user_db = load_user_db()
 
 # Load and display the logo
 image = Image.open("logo.png")
@@ -144,93 +126,53 @@ def main():
         st.write("Your advanced tool for recognizing and interpreting traffic signs to enhance autonomous vehicle navigation.")
         st.image("giff.gif", use_column_width=True)
 
-        # Buttons for login and signup
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("Login"):
-                st.session_state.signup = False
-        with col2:
-            if st.button("Signup"):
-                st.session_state.signup = True
-
-        if not st.session_state.get("signup", False):
-            st.subheader("Login")
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-
-            if st.button("Submit Login"):
-                if username in user_db:
-                    hashed_password = user_db[username]
-                    if pwd_context.verify(password, hashed_password):
-                        st.session_state["authenticated"] = True
-                        st.success("Login successful!")
-                    else:
-                        st.error("Invalid password")
-                else:
-                    st.error("Username not found")
-        else:
-            st.subheader("Sign Up")
-            new_username = st.text_input("New Username")
-            new_password = st.text_input("New Password", type="password")
-            
-            if st.button("Submit Signup"):
-                if new_username in user_db:
-                    st.error("Username already exists")
-                else:
-                    user_db[new_username] = pwd_context.hash(new_password)
-                    save_user_db(user_db)  # Save user_db to file
-                    st.success("Sign Up successful! You can now login.")
-
     # Prediction Page
     elif selected == "Prediction":
-        if "authenticated" in st.session_state and st.session_state["authenticated"]:
-            st.title("Traffic Sign Classifier")
-            st.write("Choose an option to capture an image for classification:")
+        st.title("Traffic Sign Classifier")
+        st.write("Choose an option to capture an image for classification:")
 
-            # Option for image upload
-            uploaded_file = st.file_uploader("Upload an image file", type=["jpg", "jpeg", "png"])
+        # Option for image upload
+        uploaded_file = st.file_uploader("Upload an image file", type=["jpg", "jpeg", "png"])
 
-            if uploaded_file is not None:
-                img = Image.open(uploaded_file)
-                st.image(img, caption='Uploaded Image', use_column_width=True)
+        if uploaded_file is not None:
+            img = Image.open(uploaded_file)
+            st.image(img, caption='Uploaded Image', use_column_width=True)
+            st.write("Classifying...")
+
+            # Prediction
+            class_name = predict_image(img)
+            st.write(f"Prediction: {class_name}")
+
+            # Draw bounding box (for visualization)
+            detected_boxes = detect_objects(img)
+            for box in detected_boxes:
+                img = draw_bounding_box(img, box, class_name)
+            st.image(img, caption=f'Image with Bounding Box: {class_name}', use_column_width=True)
+
+        # Option for webcam capture
+        webcam_toggle = st.checkbox("Turn on webcam")
+
+        if webcam_toggle:
+            st.write("Webcam is active. Capture an image.")
+            img = st.camera_input("Capture Image")
+            
+            if img is not None:
+                img = Image.open(img)
+                st.image(img, caption='Captured Image', use_column_width=True)
                 st.write("Classifying...")
-
+                
                 # Prediction
                 class_name = predict_image(img)
                 st.write(f"Prediction: {class_name}")
 
-                # Draw bounding box (for visualization)
+                # Draw bounding boxes on the image
                 detected_boxes = detect_objects(img)
                 for box in detected_boxes:
                     img = draw_bounding_box(img, box, class_name)
-                st.image(img, caption=f'Image with Bounding Box: {class_name}', use_column_width=True)
+                st.image(img, caption=f'Captured Image with Bounding Box: {class_name}', use_column_width=True)
 
-            # Option for webcam capture
-            webcam_toggle = st.checkbox("Turn on webcam")
-
-            if webcam_toggle:
-                st.write("Webcam is active. Capture an image.")
-                img = st.camera_input("Capture Image")
-                
-                if img is not None:
-                    img = Image.open(img)
-                    st.image(img, caption='Captured Image', use_column_width=True)
-                    st.write("Classifying...")
-                    
-                    # Prediction
-                    class_name = predict_image(img)
-                    st.write(f"Prediction: {class_name}")
-
-                    # Draw bounding boxes on the image
-                    detected_boxes = detect_objects(img)
-                    for box in detected_boxes:
-                        img = draw_bounding_box(img, box, class_name)
-                    st.image(img, caption=f'Captured Image with Bounding Box: {class_name}', use_column_width=True)
-
-            if st.button('Reset'):
-                st.experimental_rerun()
-        else:
-            st.warning("Please log in to access this page.")
+        if st.button('Reset'):
+            st.experimental_rerun()
 
     # About Page
     elif selected == "About":
@@ -262,9 +204,7 @@ def main():
                         - **Upload Live Video:** Users can turn on the webcam or mobile camera and upload live video feed of traffic signs.
                         - **View Prediction:** Once an image of a traffic sign is uploaded, the dashboard processes the image and displays the predicted traffic sign along with its corresponding class. This feature provides users with immediate feedback on the traffic sign’s identification, helping to ensure that they can quickly understand the type of sign and its meaning. 
                         - **Learn About the Traffic Sign:** After viewing the prediction, users can access detailed information about the identified traffic sign. This includes its meaning, the actions required in response to the sign, and any relevant traffic rules or regulations.""")
-        with col8:
             st.image("bg3.png", use_column_width=True)
-
 
 if __name__ == "__main__":
     main()
